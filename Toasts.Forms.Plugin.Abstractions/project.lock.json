@@ -2634,27 +2634,24 @@
     ".NETStandard,Version=v1.1": []
   },
   "packageFolders": {
-    "C:\\Users\\Adam\\.nuget\\packages\\": {}
+    "/Users/robert.knox/.nuget/packages/": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "D:\\Source\\Repos\\Toasts.Forms.Plugin\\Toasts.Forms.Plugin.Abstractions\\Toasts.Forms.Plugin.Abstractions.csproj",
+      "projectUniqueName": "/Users/robert.knox/Documents/_Projects/Custom_ToastsFormsPlugin/Toasts.Forms.Plugin.Abstractions/Toasts.Forms.Plugin.Abstractions.csproj",
       "projectName": "Toasts.Forms.Plugin.Abstractions",
-      "projectPath": "D:\\Source\\Repos\\Toasts.Forms.Plugin\\Toasts.Forms.Plugin.Abstractions\\Toasts.Forms.Plugin.Abstractions.csproj",
-      "projectJsonPath": "D:\\Source\\Repos\\Toasts.Forms.Plugin\\Toasts.Forms.Plugin.Abstractions\\project.json",
-      "packagesPath": "C:\\Users\\Adam\\.nuget\\packages\\",
-      "outputPath": "D:\\Source\\Repos\\Toasts.Forms.Plugin\\Toasts.Forms.Plugin.Abstractions\\obj\\",
+      "projectPath": "/Users/robert.knox/Documents/_Projects/Custom_ToastsFormsPlugin/Toasts.Forms.Plugin.Abstractions/Toasts.Forms.Plugin.Abstractions.csproj",
+      "projectJsonPath": "/Users/robert.knox/Documents/_Projects/Custom_ToastsFormsPlugin/Toasts.Forms.Plugin.Abstractions/project.json",
+      "packagesPath": "/Users/robert.knox/.nuget/packages/",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
-        "D:\\Source\\Repos\\Toasts.Forms.Plugin\\.nuget\\NuGet.Config",
-        "C:\\Users\\Adam\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/Users/robert.knox/Documents/_Projects/Custom_ToastsFormsPlugin/.nuget/nuget.config",
+        "/Users/robert.knox/.config/NuGet/NuGet.Config"
       ],
       "sources": {
-        "C:\\LocalRepository": {},
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://www.myget.org/F/xamarinforms-ci/api/v2": {}
+        "/Users/robert.knox/Documents/LocalNuget": {},
+        "http://10.26.2.13:81/nuget/Mobile/": {},
+        "https://www.nuget.org/api/v2/": {}
       }
     },
     "dependencies": {

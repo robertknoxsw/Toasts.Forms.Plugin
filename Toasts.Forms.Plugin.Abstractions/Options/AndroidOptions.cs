@@ -10,5 +10,6 @@ namespace Plugin.Toasts
         public int? SmallDrawableIcon { get; set; } = null;
         public string DismissText { get; set; } = "Dismiss";
         public string ViewText { get; set; } = "View";
+        public string HexColour { get; set; } = "#FFFFFFFF";
     }
 }
