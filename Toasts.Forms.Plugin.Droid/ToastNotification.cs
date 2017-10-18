@@ -56,7 +56,7 @@ namespace Plugin.Toasts
             }).ContinueWith((task) =>
             {
                 var tResult = task.Result;
-                if (options.AndroidOptions.ShowDebugCallbackToast)
+                if (options.AndroidOptions.DebugShowCallbackToast)
                 {
                     _activity.RunOnUiThread(() =>
                     {

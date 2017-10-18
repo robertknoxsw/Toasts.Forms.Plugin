@@ -11,9 +11,10 @@ namespace Plugin.Toasts
         public string DismissText { get; set; } = "Dismiss";
         public string ViewText { get; set; } = "View";
         public string HexColour { get; set; } = "#FFFFFFFF";
+        public bool ForceOpenAppOnNotificationTap { get; set; } = false;
 
         // Debug Help
-        public bool ShowDebugCallbackToast { get; set; } = false;
-        public bool ShowNotificationIdInTitle { get; set; } = false;
+        public bool DebugShowCallbackToast { get; set; } = false;
+        public bool DebugShowIdInTitle { get; set; } = false;
     }
 }

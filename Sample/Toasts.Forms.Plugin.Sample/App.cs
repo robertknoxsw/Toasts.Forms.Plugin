@@ -21,10 +21,11 @@ namespace Toasts.Forms.Plugin.Sample
                         IsClickable = true,
                         WindowsOptions = new WindowsOptions() { LogoUri = "icon.png" },
                         ClearFromHistory = false,
-                        //DelayUntil = DateTime.Now.AddSeconds((new Random()).Next((3 + i), (6 + i))),
+                        DelayUntil = DateTime.Now.AddSeconds((new Random()).Next((3 + i), (6 + i))),
                         AndroidOptions = new AndroidOptions()
                         {
-                            HexColour = "#F99D1C"
+                            HexColour = "#F99D1C",
+                            ForceOpenAppOnNotificationTap = true
                         }
                     });
                 }

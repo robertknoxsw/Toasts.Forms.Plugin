@@ -19,6 +19,7 @@ namespace Plugin.Toasts
         public const string NotificationId = "NOTIFICATION_ID";
         public const string DismissedClickIntent = "android.intent.action.DISMISSED";
         public const string OnClickIntent = "android.intent.action.CLICK";
+        public const string NotificationForceOpenApp = "NOTIFICATION_FORCEOPEN";
 
         int _count = 0;
         object _lock = new object();
@@ -87,6 +88,7 @@ namespace Plugin.Toasts
                 var serializedNotification = Serialize(notification);
                 intent.PutExtra(AlarmHandler.NotificationKey, serializedNotification);
                 intent.PutExtra(NotificationId, id);
+                intent.PutExtra(NotificationForceOpenApp, options.AndroidOptions.ForceOpenAppOnNotificationTap);
 
                 var pendingIntent = PendingIntent.GetBroadcast(Application.Context, (123 + int.Parse(id)), intent, PendingIntentFlags.CancelCurrent);
                 var timeTriggered = ConvertToMilliseconds(options.DelayUntil.Value);
@@ -146,6 +148,7 @@ namespace Plugin.Toasts
 
                 var clickIntent = new Intent(OnClickIntent);
                 clickIntent.PutExtra(NotificationId, notificationId);
+                clickIntent.PutExtra(NotificationForceOpenApp, options.AndroidOptions.ForceOpenAppOnNotificationTap);
 
                 // Add custom args
                 if (options.CustomArgs != null)
@@ -160,7 +163,7 @@ namespace Plugin.Toasts
                 }
 
                 Android.App.Notification.Builder builder = new Android.App.Notification.Builder(Application.Context)
-                    .SetContentTitle(options.AndroidOptions.ShowNotificationIdInTitle ? "[" + id + "] " + options.Title : options.Title)
+                    .SetContentTitle(options.AndroidOptions.DebugShowIdInTitle ? "[" + id + "] " + options.Title : options.Title)
                     .SetContentText(options.Description)
                     .SetSmallIcon(smallIcon) // Must have small icon to display
                     .SetPriority((int)NotificationPriority.High) // Must be set to High to get Heads-up notification
@@ -260,12 +263,37 @@ namespace Plugin.Toasts
                 switch (intent.Action)
                 {
                     case NotificationBuilder.OnClickIntent:
+
+                        try
+                        {
+                            // Attempt to re-focus/open the app.
+                            var doForceOpen = intent.Extras.GetBoolean(NotificationBuilder.NotificationForceOpenApp, false);
+                            if (doForceOpen)
+                            {
+                                var packageManager = Application.Context.PackageManager;
+                                Intent launchIntent = packageManager.GetLaunchIntentForPackage(NotificationBuilder.PackageName);
+                                if (launchIntent != null)
+                                {
+                                    launchIntent.AddCategory(Intent.CategoryLauncher);
+                                    Application.Context.StartActivity(launchIntent);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine("Failed to re-focus/launch the app: " + ex);
+                        }
+
+                        // Click
                         if (NotificationBuilder.EventResult != null && !NotificationBuilder.EventResult.ContainsKey(notificationId.ToString()))
                         {
                             NotificationBuilder.EventResult.Add(notificationId.ToString(), new NotificationResult() { Action = NotificationAction.Clicked, Id = notificationId });
                         }
                         break;
+
                     default:
+
+                        // Dismiss/Default
                         if (NotificationBuilder.EventResult != null && !NotificationBuilder.EventResult.ContainsKey(notificationId.ToString()))
                         {
                             NotificationBuilder.EventResult.Add(notificationId.ToString(), new NotificationResult() { Action = NotificationAction.Dismissed, Id = notificationId });

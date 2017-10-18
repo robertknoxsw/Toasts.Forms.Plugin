@@ -25,13 +25,22 @@ namespace Plugin.Toasts
 
             // Show Notification
             Android.App.Notification.Builder builder = new Android.App.Notification.Builder(Application.Context)
-                .SetContentTitle(options.AndroidOptions.ShowNotificationIdInTitle ? "[" + id + "] " + options.Title : options.Title)
+                .SetContentTitle(options.AndroidOptions.DebugShowIdInTitle ? "[" + id + "] " + options.Title : options.Title)
                 .SetContentText(options.Description)
                 .SetSmallIcon(options.AndroidOptions.SmallDrawableIcon.Value) // Must have small icon to display
                 .SetPriority((int)NotificationPriority.High) // Must be set to High to get Heads-up notification
                 .SetDefaults(NotificationDefaults.All) // Must also include vibrate to get Heads-up notification
                 .SetAutoCancel(true)
                 .SetColor(Color.ParseColor(options.AndroidOptions.HexColour));
+
+            if (options.AndroidOptions.ForceOpenAppOnNotificationTap)
+            {
+                var clickIntent = new Intent(NotificationBuilder.OnClickIntent);
+                clickIntent.PutExtra(NotificationBuilder.NotificationId, int.Parse(id));
+                clickIntent.PutExtra(NotificationBuilder.NotificationForceOpenApp, options.AndroidOptions.ForceOpenAppOnNotificationTap);
+                var pendingClickIntent = PendingIntent.GetBroadcast(Application.Context, (123 + int.Parse(id)), clickIntent, 0);
+                builder.SetContentIntent(pendingClickIntent);
+            }
 
             Android.App.Notification notification = builder.Build();
 

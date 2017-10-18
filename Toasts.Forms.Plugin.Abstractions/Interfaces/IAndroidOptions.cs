@@ -9,9 +9,10 @@
         string ViewText { get; set; }
         string DismissText { get; set; }
         string HexColour { get; set; }
+        bool ForceOpenAppOnNotificationTap { get; set; }
 
         // Debug Help
-        bool ShowDebugCallbackToast { get; set; }
-        bool ShowNotificationIdInTitle { get; set; }
+        bool DebugShowCallbackToast { get; set; }
+        bool DebugShowIdInTitle { get; set; }
     }
 }
