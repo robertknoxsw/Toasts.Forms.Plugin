@@ -18,9 +18,14 @@ namespace Plugin.Toasts
             var id = intent.GetStringExtra(NotificationBuilder.NotificationId);
             var options = DeserializeNotification(extra);
 
+            if (!string.IsNullOrEmpty(options.AndroidOptions.HexColour) && options.AndroidOptions.HexColour.Substring(0, 1) != "#")
+            {
+                options.AndroidOptions.HexColour = "#" + options.AndroidOptions.HexColour;
+            }
+
             // Show Notification
             Android.App.Notification.Builder builder = new Android.App.Notification.Builder(Application.Context)
-                .SetContentTitle(options.Title)
+                .SetContentTitle(options.AndroidOptions.ShowNotificationIdInTitle ? "[" + id + "] " + options.Title : options.Title)
                 .SetContentText(options.Description)
                 .SetSmallIcon(options.AndroidOptions.SmallDrawableIcon.Value) // Must have small icon to display
                 .SetPriority((int)NotificationPriority.High) // Must be set to High to get Heads-up notification

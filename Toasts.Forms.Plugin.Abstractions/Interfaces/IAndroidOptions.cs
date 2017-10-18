@@ -9,5 +9,9 @@
         string ViewText { get; set; }
         string DismissText { get; set; }
         string HexColour { get; set; }
+
+        // Debug Help
+        bool ShowDebugCallbackToast { get; set; }
+        bool ShowNotificationIdInTitle { get; set; }
     }
 }

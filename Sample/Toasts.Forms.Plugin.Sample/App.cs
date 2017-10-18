@@ -1,6 +1,5 @@
 ﻿using Xamarin.Forms;
 using Plugin.Toasts;
-using System.Threading.Tasks;
 using System;
 
 namespace Toasts.Forms.Plugin.Sample
@@ -10,15 +9,26 @@ namespace Toasts.Forms.Plugin.Sample
         public App()
         {
             Button showToast = new Button { Text = "Show Toast" };
-            showToast.Clicked += (s, e) => ShowToast(new NotificationOptions()
+
+            showToast.Clicked += (s, e) =>
             {
-                Title = "Title",
-                Description = "Some Description",
-                IsClickable = true,
-                WindowsOptions = new WindowsOptions() { LogoUri = "icon.png" },
-                ClearFromHistory = false,
-                DelayUntil = DateTime.Now.AddSeconds(10)
-            });
+                for (int i = 0; i < 6; i++)
+                {
+                    ShowToast(new NotificationOptions()
+                    {
+                        Title = "The Title Line",
+                        Description = "The Description Content",
+                        IsClickable = true,
+                        WindowsOptions = new WindowsOptions() { LogoUri = "icon.png" },
+                        ClearFromHistory = false,
+                        //DelayUntil = DateTime.Now.AddSeconds((new Random()).Next((3 + i), (6 + i))),
+                        AndroidOptions = new AndroidOptions()
+                        {
+                            HexColour = "#F99D1C"
+                        }
+                    });
+                }
+            };
 
             // The root page of your application
             MainPage = new ContentPage
@@ -34,12 +44,14 @@ namespace Toasts.Forms.Plugin.Sample
 
         }
 
-        private async void ShowToast(INotificationOptions options)
+        void ShowToast(INotificationOptions options)
         {
             var notificator = DependencyService.Get<IToastNotificator>();
-
-            var result = await notificator.Notify(options);
-
+            notificator.Notify((INotificationResult result) =>
+            {
+                System.Diagnostics.Debug.WriteLine("Notification [" + result.Id + "] Result Action: " + result.Action);
+            }, options);
         }
+
     }
 }
