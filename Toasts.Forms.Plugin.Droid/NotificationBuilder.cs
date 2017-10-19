@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Xml.Serialization;
+using Plugin.Toasts.Interfaces;
 
 namespace Plugin.Toasts
 {
@@ -15,11 +16,16 @@ namespace Plugin.Toasts
 
         public static IDictionary<string, ManualResetEvent> ResetEvent = new Dictionary<string, ManualResetEvent>();
         public static IDictionary<string, NotificationResult> EventResult = new Dictionary<string, NotificationResult>();
+        public static List<string> Channels = new List<string>();
 
         public const string NotificationId = "NOTIFICATION_ID";
         public const string DismissedClickIntent = "android.intent.action.DISMISSED";
         public const string OnClickIntent = "android.intent.action.CLICK";
         public const string NotificationForceOpenApp = "NOTIFICATION_FORCEOPEN";
+
+        public const string DefaultChannelName = "default";
+
+        public const int StartId = 123;
 
         int _count = 0;
         object _lock = new object();
@@ -39,6 +45,34 @@ namespace Plugin.Toasts
             Application.Context.RegisterReceiver(_receiver, filter);
 
             _androidOptions = androidOptions;
+        }
+
+        public static string GetOrCreateChannel(IAndroidChannelOptions channelOptions)
+        {
+            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
+            {
+                var channelId = channelOptions.Name.Replace(" ", string.Empty).ToLower();
+                if (!Channels.Contains(channelId))
+                {
+                    // Create new channel.
+                    var newChannel = new NotificationChannel(channelId, channelOptions.Name, NotificationImportance.High);
+                    newChannel.EnableVibration(channelOptions.EnableVibration);
+                    newChannel.SetShowBadge(channelOptions.ShowBadge);
+                    if (!string.IsNullOrEmpty(channelOptions.Description))
+                    {
+                        newChannel.Description = channelOptions.Description;
+                    }
+
+                    // Register channel.
+                    var notificationManager = Application.Context.GetSystemService(Context.NotificationService) as NotificationManager;
+                    notificationManager.CreateNotificationChannel(newChannel);
+
+                    // Save Id for reference.
+                    Channels.Add(channelId);
+                }
+                return channelId;
+            }
+            return null;
         }
 
         public IList<INotification> GetDeliveredNotifications()
@@ -90,7 +124,7 @@ namespace Plugin.Toasts
                 intent.PutExtra(NotificationId, id);
                 intent.PutExtra(NotificationForceOpenApp, options.AndroidOptions.ForceOpenAppOnNotificationTap);
 
-                var pendingIntent = PendingIntent.GetBroadcast(Application.Context, (123 + int.Parse(id)), intent, PendingIntentFlags.CancelCurrent);
+                var pendingIntent = PendingIntent.GetBroadcast(Application.Context, (StartId + int.Parse(id)), intent, PendingIntentFlags.CancelCurrent);
                 var timeTriggered = ConvertToMilliseconds(options.DelayUntil.Value);
                 var alarmManager = Application.Context.GetSystemService(Context.AlarmService) as AlarmManager;
 
@@ -144,7 +178,7 @@ namespace Plugin.Toasts
                 var dismissIntent = new Intent(DismissedClickIntent);
                 dismissIntent.PutExtra(NotificationId, notificationId);
 
-                var pendingDismissIntent = PendingIntent.GetBroadcast(Application.Context, (123 + notificationId), dismissIntent, 0);
+                var pendingDismissIntent = PendingIntent.GetBroadcast(Application.Context, (StartId + notificationId), dismissIntent, 0);
 
                 var clickIntent = new Intent(OnClickIntent);
                 clickIntent.PutExtra(NotificationId, notificationId);
@@ -155,7 +189,7 @@ namespace Plugin.Toasts
                     foreach (var arg in options.CustomArgs)
                         clickIntent.PutExtra(arg.Key, arg.Value);
 
-                var pendingClickIntent = PendingIntent.GetBroadcast(Application.Context, (123 + notificationId), clickIntent, 0);
+                var pendingClickIntent = PendingIntent.GetBroadcast(Application.Context, (StartId + notificationId), clickIntent, 0);
 
                 if (!string.IsNullOrEmpty(options.AndroidOptions.HexColour) && options.AndroidOptions.HexColour.Substring(0, 1) != "#")
                 {
@@ -172,6 +206,16 @@ namespace Plugin.Toasts
                     .SetContentIntent(pendingClickIntent) // Must have Intent to accept the click                   
                     .SetDeleteIntent(pendingDismissIntent)
                     .SetColor(Color.ParseColor(options.AndroidOptions.HexColour));
+
+                // Notification Channel
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
+                {
+                    var notificationChannelId = GetOrCreateChannel(options.AndroidOptions.ChannelOptions);
+                    if (!string.IsNullOrEmpty(notificationChannelId))
+                    {
+                        builder.SetChannelId(notificationChannelId);
+                    }
+                }
 
                 Android.App.Notification notification = builder.Build();
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using Plugin.Toasts.Interfaces;
+using Plugin.Toasts.Options;
 
 namespace Plugin.Toasts
 {
@@ -12,6 +14,7 @@ namespace Plugin.Toasts
         public string ViewText { get; set; } = "View";
         public string HexColour { get; set; } = "#FFFFFFFF";
         public bool ForceOpenAppOnNotificationTap { get; set; } = false;
+        public IAndroidChannelOptions ChannelOptions { get; set; } = new AndroidChannelOptions();
 
         // Debug Help
         public bool DebugShowCallbackToast { get; set; } = false;

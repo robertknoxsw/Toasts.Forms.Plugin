@@ -38,8 +38,18 @@ namespace Plugin.Toasts
                 var clickIntent = new Intent(NotificationBuilder.OnClickIntent);
                 clickIntent.PutExtra(NotificationBuilder.NotificationId, int.Parse(id));
                 clickIntent.PutExtra(NotificationBuilder.NotificationForceOpenApp, options.AndroidOptions.ForceOpenAppOnNotificationTap);
-                var pendingClickIntent = PendingIntent.GetBroadcast(Application.Context, (123 + int.Parse(id)), clickIntent, 0);
+                var pendingClickIntent = PendingIntent.GetBroadcast(Application.Context, (NotificationBuilder.StartId + int.Parse(id)), clickIntent, 0);
                 builder.SetContentIntent(pendingClickIntent);
+            }
+
+            // Notification Channel
+            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.O)
+            {
+                var notificationChannelId = NotificationBuilder.GetOrCreateChannel(options.AndroidOptions.ChannelOptions);
+                if (!string.IsNullOrEmpty(notificationChannelId))
+                {
+                    builder.SetChannelId(notificationChannelId);
+                }
             }
 
             Android.App.Notification notification = builder.Build();
